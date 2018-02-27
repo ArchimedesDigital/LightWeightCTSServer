@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/gorilla/mux"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -15,6 +14,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 type Word struct {
@@ -282,7 +283,7 @@ func ParseCTS(p CTSParams) ParsedCTS {
 
 	re_inside_whtsp := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
 	var result string
-	var identifiers []string
+	var identifiers []string // available citation IDs for the work
 	var text_content []string
 	startid := p.StartID
 	endid := p.EndID
@@ -537,6 +538,8 @@ func ParseCTS(p CTSParams) ParsedCTS {
 			text_content[i] = "<div n=\"" + identifiers[i] + "\">" + text_content[i] + "</div>"
 		}
 		result = strings.Join(text_content, "</br>")
+
+	// get the specific citation when only citation ID (startid) is set
 	case startid != "" && endid == "":
 		var index1 int
 		index1 = finder(identifiers, startid)
@@ -569,6 +572,8 @@ func main() {
 	router.HandleFunc("/cex/{source}/{urns}", NWAtext)
 	router.HandleFunc("/cex/nwa/{urns}", NWAcex)
 	router.HandleFunc("/{key}", serveTemplate)
+	// APIs
+	router.HandleFunc("/api/cts/text/{urn}", APICTSTextRetrieve).Methods("GET")
 	log.Println("Listening at" + serverIP + "...")
 	log.Fatal(http.ListenAndServe(serverIP, router))
 }

@@ -40,3 +40,7 @@ Here is video that demonstrates how easy it is to integrate new XML file: https:
 1. config.json is pretty much self-explicable. You can point the app to a web resource where CTS XML text are stored if you like though.
 2. You can change the look and feel of your website using HTML and CSS 
 3. The webpage connects to hypothes.is you can annotate any text and share notes publically if you like
+
+## Testing
+
+Partially covered tests: `go test -v`
