@@ -26,7 +26,7 @@ func Test_URN_struct_is_constructed_correctly(t *testing.T) {
 
 	expectedURN := URN{
 		rawURN:       "tlg0012.tlg001.perseus-grc2:1.1-1.2",
-		WorkID:       "tlg0012.tlg001.perseus-grc2",
+		WorkFileName: "tlg0012.tlg001.perseus-grc2.xml",
 		PassageStart: "1.1",
 		PassageEnd:   "1.2",
 	}
@@ -40,13 +40,12 @@ func Test_URN_struct_is_constructed_correctly(t *testing.T) {
 
 }
 
-func TestGetTextByURN(t *testing.T) {
+func Test_can_get_Text_by_URN(t *testing.T) {
 
 	// prepare request
 	uri := "/api/cts/text/"
-	urnInRequest := "tlg0012.tlg001.perseus-grc2:1.1"
+	urnInRequest := "tlg0012.tlg001.perseus-grc2:1.1-1.2"
 	req, err := http.NewRequest(http.MethodGet, uri+urnInRequest, nil)
-	//log.Println(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,11 +55,15 @@ func TestGetTextByURN(t *testing.T) {
 	testServer().ServeHTTP(resp, req)
 
 	// check expectations
-	expectedResponse, _ := json.Marshal("tlg0012.tlg001.perseus-grc2:1.1")
-	//log.Println(resp.Body)
+	expectedPassageCitationIDs := []string{"1.1", "1.2"}
 	acturalResponse := resp.Body.String()
-	if string(expectedResponse) != acturalResponse {
-		t.Errorf("Expected %s got %s", expectedResponse, acturalResponse)
+	acturalText := &Text{}
+	_ = json.Unmarshal([]byte(acturalResponse), acturalText)
+	for _, citationID := range expectedPassageCitationIDs {
+		_, ok := acturalText.MapCitationPassage[citationID]
+		if !ok {
+			t.Errorf("Expected citationID %s in %s", citationID, acturalText.MapCitationPassage)
+		}
 	}
 
 }

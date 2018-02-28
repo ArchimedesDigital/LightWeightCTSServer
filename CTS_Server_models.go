@@ -6,12 +6,13 @@ import (
 )
 
 type Text struct {
-	URN string
+	RawURN             string
+	MapCitationPassage map[string]string
 }
 
 type URN struct {
 	rawURN       string
-	WorkID       string
+	WorkFileName string
 	PassageStart string
 	PassageEnd   string
 }
@@ -19,15 +20,19 @@ type URN struct {
 // construct a URN struct from rawURN string
 func NewURN(s string) *URN {
 	// initialize workID as rawURN
-	var workID, passageStart, passageEnd string
+	var workFileName, passageStart, passageEnd string
 
 	// check and split by ':'
 	workSeparator := ":"
 	if strings.ContainsAny(s, workSeparator+"|") {
 		splitedURN := strings.Split(s, workSeparator)
-		workID = splitedURN[0]       // trim the passage part off
+		workFileName = splitedURN[0] // trim the passage part off
 		passageStart = splitedURN[1] // now passage query exists
+	} else {
+		workFileName = s
 	}
+
+	workFileName = strings.Join([]string{workFileName, "xml"}, ".") // append file extension TODO: support other file types
 
 	// check and split by '-'
 	passageSeparator := "-"
@@ -39,7 +44,7 @@ func NewURN(s string) *URN {
 
 	return &URN{
 		rawURN:       s,
-		WorkID:       workID,
+		WorkFileName: workFileName,
 		PassageStart: passageStart,
 		PassageEnd:   passageEnd,
 	}

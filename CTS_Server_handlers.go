@@ -15,13 +15,17 @@ func APICTSTextRetrieve(w http.ResponseWriter, r *http.Request) {
 	// prepare filters
 	params := mux.Vars(r)
 	urn := NewURN(params["urn"])
-
-	//log.Println(urn)
+	ctsParames := CTSParams{
+		Sourcetext: urn.WorkFileName,
+		StartID:    urn.PassageStart,
+		EndID:      urn.PassageEnd,
+	}
 
 	// get the text
-	// TODO
+	textContent := ParseCTS(ctsParames)
 	resp := Text{
-		URN: urn.rawURN,
+		RawURN:             urn.rawURN,
+		MapCitationPassage: textContent.MapCitationPassage,
 	}
 
 	// prepare json resp TODO: encapsulation

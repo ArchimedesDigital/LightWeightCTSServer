@@ -69,9 +69,10 @@ type CTSXMLPage struct {
 }
 
 type ParsedCTS struct {
-	Title   string
-	Author  string
-	Passage string
+	Title              string
+	Author             string
+	Passage            string
+	MapCitationPassage map[string]string
 }
 
 type CTSParams struct {
@@ -283,6 +284,7 @@ func ParseCTS(p CTSParams) ParsedCTS {
 
 	re_inside_whtsp := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
 	var result string
+	mapCitationPassage := make(map[string]string)
 	var identifiers []string // available citation IDs for the work
 	var text_content []string
 	startid := p.StartID
@@ -506,6 +508,7 @@ func ParseCTS(p CTSParams) ParsedCTS {
 	}
 
 	switch {
+	// citation range
 	case startid != "" && endid != "":
 		var index1 int
 		var index2 int
@@ -532,7 +535,8 @@ func ParseCTS(p CTSParams) ParsedCTS {
 			identifiers[len(identifiers)-1] = identifiers[len(identifiers)-1] + "@" + endreplace
 		}
 		text_content = text_content[index1:index2]
-		for i, _ := range identifiers {
+		for i, citationID := range identifiers {
+			mapCitationPassage[citationID] = text_content[i]
 			text_content[i] = re_inside_whtsp.ReplaceAllString(text_content[i], " ")
 			text_content[i] = strings.Replace(text_content[i], "\n", "<br>", -1)
 			text_content[i] = "<div n=\"" + identifiers[i] + "\">" + text_content[i] + "</div>"
@@ -543,18 +547,27 @@ func ParseCTS(p CTSParams) ParsedCTS {
 	case startid != "" && endid == "":
 		var index1 int
 		index1 = finder(identifiers, startid)
+		mapCitationPassage[startid] = text_content[index1]
 		text_content[index1] = re_inside_whtsp.ReplaceAllString(text_content[index1], " ")
 		text_content[index1] = strings.Replace(text_content[index1], "\n", "<br>", -1)
 		result = "<div n=\"" + identifiers[index1] + "\">" + text_content[index1] + "</div>"
+
+	// full work
 	default:
-		for i, _ := range identifiers {
+		for i, citationID := range identifiers {
+			mapCitationPassage[citationID] = text_content[i]
 			text_content[i] = re_inside_whtsp.ReplaceAllString(text_content[i], " ")
 			text_content[i] = strings.Replace(text_content[i], "\n", "<br>", -1)
 			text_content[i] = "<div n=\"" + identifiers[i] + "\">" + text_content[i] + "</div>"
 		}
 		result = strings.Join(text_content, "</br>")
 	}
-	result_struct := ParsedCTS{Title: vr.Titles.Title[0], Author: vr.Titles.Author[0], Passage: result}
+	result_struct := ParsedCTS{
+		Title:              vr.Titles.Title[0],
+		Author:             vr.Titles.Author[0],
+		Passage:            result,
+		MapCitationPassage: mapCitationPassage,
+	}
 	return result_struct
 }
 

@@ -41,6 +41,19 @@ Here is video that demonstrates how easy it is to integrate new XML file: https:
 2. You can change the look and feel of your website using HTML and CSS 
 3. The webpage connects to hypothes.is you can annotate any text and share notes publically if you like
 
-## Testing
+
+---
+## APIs
+
+Response in JSON
+
+Full work [GET] http://localhost:8000/api/cts/text/tlg0012.tlg001.perseus-grc2
+
+Citation [GET] http://localhost:8000/api/cts/text/tlg0012.tlg001.perseus-grc2:1.1
+
+Citation range [GET] http://localhost:8000/api/cts/text/tlg0012.tlg001.perseus-grc2:1.1-1.12
+
+---
+## Tests
 
 Partially covered tests: `go test -v`
