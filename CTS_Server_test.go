@@ -4,9 +4,9 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/gorilla/mux"
@@ -20,13 +20,33 @@ func testServer() http.Handler {
 }
 
 // TODO: test real data
+
+func Test_URN_struct_is_constructed_correctly(t *testing.T) {
+	// TODO: table tests
+
+	expectedURN := URN{
+		rawURN:       "tlg0012.tlg001.perseus-grc2:1.1-1.2",
+		WorkID:       "tlg0012.tlg001.perseus-grc2",
+		PassageStart: "1.1",
+		PassageEnd:   "1.2",
+	}
+
+	rawURN := "tlg0012.tlg001.perseus-grc2:1.1-1.2"
+	urn := NewURN(rawURN)
+
+	if !reflect.DeepEqual(urn, &expectedURN) {
+		t.Errorf("Expected %s got %s", &expectedURN, urn)
+	}
+
+}
+
 func TestGetTextByURN(t *testing.T) {
 
 	// prepare request
 	uri := "/api/cts/text/"
 	urnInRequest := "tlg0012.tlg001.perseus-grc2:1.1"
 	req, err := http.NewRequest(http.MethodGet, uri+urnInRequest, nil)
-	log.Println(req)
+	//log.Println(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,10 +57,10 @@ func TestGetTextByURN(t *testing.T) {
 
 	// check expectations
 	expectedResponse, _ := json.Marshal("tlg0012.tlg001.perseus-grc2:1.1")
-	log.Println(resp.Body)
+	//log.Println(resp.Body)
 	acturalResponse := resp.Body.String()
 	if string(expectedResponse) != acturalResponse {
-		t.Fatalf("Expected %s got %s", expectedResponse, acturalResponse)
+		t.Errorf("Expected %s got %s", expectedResponse, acturalResponse)
 	}
 
 }

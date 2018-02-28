@@ -4,7 +4,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,14 +14,18 @@ import (
 func APICTSTextRetrieve(w http.ResponseWriter, r *http.Request) {
 	// prepare filters
 	params := mux.Vars(r)
-	urn := params["urn"]
-	log.Println("urn: ", urn)
+	urn := NewURN(params["urn"])
+
+	//log.Println(urn)
 
 	// get the text
 	// TODO
+	resp := Text{
+		URN: urn.rawURN,
+	}
 
 	// prepare json resp TODO: encapsulation
-	respJson, err := json.Marshal(urn)
+	respJson, err := json.Marshal(resp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
