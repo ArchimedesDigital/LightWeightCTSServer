@@ -574,6 +574,14 @@ func ParseCTS(p CTSParams) ParsedCTS {
 func main() {
 	confvar := LoadConfiguration("./config.json")
 	serverIP := confvar.Port
+
+	// check for env vars
+	envPort := os.Getenv("PORT")
+	if envPort != "" {
+		serverIP = ":" + envPort
+	}
+
+	log.Println(serverIP)
 	router := mux.NewRouter().StrictSlash(true)
 	s := http.StripPrefix("/static/", http.FileServer(http.Dir("./static/")))
 	router.PathPrefix("/static/").Handler(s)
