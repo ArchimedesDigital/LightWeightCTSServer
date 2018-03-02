@@ -1,0 +1,16 @@
+{
+	"ImportPath": "LightWeightCTSServer",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v80",
+	"Deps": [
+		{
+			"ImportPath": "github.com/aebruno/nwalgo",
+			"Rev": "4a232086e3ad8e44b4dee2b32924f15189c41f87"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.6.1-12-g07ba1fd",
+			"Rev": "07ba1fd60e210dc5cc6f86ec25dc9ecc7c95c295"
+		}
+	]
+}
